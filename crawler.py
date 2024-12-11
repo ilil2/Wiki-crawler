@@ -27,9 +27,10 @@ def get_all_url(url):
 def verify_url(urls, verify_urls):
     res = []
     for i in range(len(urls)):
-        if urls[i] not in verify_urls and urls[i] not in res:
-            res.append("https://fr.wikipedia.org" + urls[i])
-    return set(res)
+        full_url = "https://fr.wikipedia.org" + urls[i]
+        if full_url not in verify_urls and full_url not in res:
+            res.append(full_url)
+    return res
 
 def print_urls(urls):
     if os.name == "nt":
@@ -44,10 +45,11 @@ def crawl_wikipedia(i, start_url, verify_urls):
         return
     urls = get_all_url(start_url)
     urls = verify_url(urls, verify_urls)
-    verify_urls |= urls
+    verify_urls.update(urls)
+    urls = sorted(urls)
+    print("level : %s, len verif : %s, len urls : %s, start : %s"%(2-i, len(verify_urls), len(urls), start_url.split("/")[-1]))
     for j in range(len(urls)):
-        print("level : %s, len verif : %s, len urls : %s, principal : %s"%(2-i, len(verify_urls), len(urls), sorted(list(urls))[j]))
-        crawl_wikipedia(i-1, sorted(list(urls))[j], verify_urls)
+        crawl_wikipedia(i-1, urls[j], verify_urls)
 
 def main():
     start_url = "https://fr.wikipedia.org/wiki/Alan_Turing"
